@@ -1,14 +1,12 @@
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Board {
 
-    private static final double DOOR_WIDTH = 1.2;
-    private static final double TARGET_DISTANCE_FROM_DOOR = -10;
-    private static final double TARGET_LENGTH = 3;
-    private static final double TARGET_TRIM = 0.2;
+    public static final double DOOR_WIDTH = 1.2;
+    public static final double TARGET_DISTANCE_FROM_DOOR = -10;
+    public static final double TARGET_LENGTH = 3;
+    public static final double TARGET_TRIM = 0.2;
 
     private final double L;
     private final double minR;
@@ -17,6 +15,7 @@ public class Board {
     private final double Ve;
     private final double tau;
     private final double beta;
+    private final double dt;
     private final int M;
     private final Map<Integer, List<Particle>> cells;
     private List<Particle> particles;
@@ -30,6 +29,7 @@ public class Board {
         this.Ve = Ve;
         this.tau = tau;
         this.beta = beta;
+        this.dt = minR / 2 * Math.max(maxV, Ve);
         M = m;
         this.cells = new HashMap<>();
         sortBoard(particles);
@@ -46,7 +46,7 @@ public class Board {
     public void divideParticles() {
         for (Particle p : particles) {
             if (p.getX() < 0 || p.getX() > L || p.getY() < 0 || p.getY() > L) {
-                throw new IllegalArgumentException("Partícula fuera de los límites.");
+                throw new IllegalArgumentException("Partícula fuera de los límites." + p);
             }
             cells.get(calculateCellIndexOnBoard(p.getX(), p.getY())).add(p);
         }
@@ -73,7 +73,7 @@ public class Board {
             y = Math.random() * l;
             vel = calculateVelocityToTarget(maxV, l, x, y);
             mass = Math.random() * maxMass;
-            radius = Math.random() * maxR;
+            radius = ThreadLocalRandom.current().nextDouble(minR, maxR);
 
             particles.add(new Particle(i, x, y, vel[0], vel[1], mass, radius));
         }
@@ -81,10 +81,17 @@ public class Board {
         return new Board(l, minR, maxR, maxV, tau, beta, ve, m, particles);
     }
 
-    private static double[] calculateVelocityToTarget(final double maxV, final double l, final double x, final double y) {
+    public static double[] calculateVelocityToTarget(final double maxV, final double l, final double x, final double y) {
         double v = Math.random() * maxV;
-        double vx = v * (l / 2 - x) / Math.abs(l / 2 - x);
-        double vy = v * ((l + TARGET_DISTANCE_FROM_DOOR) - y) / Math.abs((l + TARGET_DISTANCE_FROM_DOOR) - y);
+        final double leftLimit  = l/2 - DOOR_WIDTH/2 + TARGET_TRIM*DOOR_WIDTH;
+        final double rightLimit = l/2 + DOOR_WIDTH/2 - TARGET_TRIM * DOOR_WIDTH;
+        double dx = x < leftLimit || x > rightLimit
+                ? leftLimit + Math.random() * (rightLimit - leftLimit) - x : 0;
+        final double dy = -y;
+        final double distance = Math.hypot(dx, dy);
+
+        double vx = v * (dx / distance);
+        double vy = v * (dy / distance);
 
         double[] ret = new double[2];
         ret[0] = vx;
@@ -140,70 +147,72 @@ public class Board {
         return p;
     }
 
-    public void advanceParticle(final Particle p, final Set<Particle> neighbours) {
-        double escapeX = 0;
-        double escapeY = 0;
+    public Particle advanceParticle(final Particle p, final Set<Particle> neighbours) {
+        double dx = 0;
+        double dy = 0;
 
         if (p.getX() - p.getRadius() <= 0) {
-            escapeX += 1;
+            dx += 1;
         } else if (p.getX() + p.getRadius() >= L) {
-            escapeX -= 1;
+            dx -= 1;
         }
         if (p.getY() + p.getRadius() >= L) {
-            escapeY -= 1;
+            dy -= 1;
         } else if ((p.getY() <= 0 && p.getY() + p.getRadius() >= 0) || (p.getY() > 0 && p.getY() - p.getRadius() <= 0)) {
             if (p.getX() <= L/2 - DOOR_WIDTH/2 || p.getX() >= L/2 + DOOR_WIDTH/2) {
-                escapeY += 1;
+                dy += 1;
             }
             if (p.getX() - p.getRadius() <= L/2 - DOOR_WIDTH/2) {
                 final double diffX = p.getX() - L/2 - DOOR_WIDTH/2;
                 final double distance = Math.hypot(diffX, p.getY());
 
-                escapeX += diffX / distance;
-                escapeY += p.getY() / distance;
+                dx += diffX / distance;
+                dy += p.getY() / distance;
             } else if (p.getX() + p.getRadius() >= L/2 + DOOR_WIDTH/2) {
                 final double diffX = p.getY() -  L/2 + DOOR_WIDTH/2;
                 final double distance = Math.hypot(diffX, p.getY());
 
-                escapeX += diffX / distance;
-                escapeY += p.getY() / distance;
+                dx += diffX / distance;
+                dy += p.getY() / distance;
             }
         }
 
         for(final Particle other : neighbours) {
-            final double diffX = p.getX() - other.getX();
-            final double diffY = p.getY() - other.getY();
-            final double distance = Math.hypot(diffX, diffY);
+            if(p.getId() != other.getId()){
+                double diffX = p.getX() - other.getX();
+                double diffY = p.getY() - other.getY();
+                double distance = Math.hypot(diffX, diffY);
 
-            escapeX += diffX / distance;
-            escapeY += diffY / distance;
+                dx += diffX / distance;
+                dy += diffY / distance;
+            }
         }
 
         final double newVx;
         final double newVy;
         final double newR;
-        if(escapeX == 0 && escapeY == 0) {
-            double dt = minR / 2 * Math.max(maxV, Ve);
+        if(dx == 0 && dy == 0) {
             newR = Math.min(maxR, p.getRadius() + maxR/(tau/dt));
 
             final double newVMod = maxV * Math.pow((newR - minR) / (maxR - minR), beta);
             boolean escaped = p.getY() <= 0;
-            final double targetDirX = targetX(p.getX(), escaped);
-            final double targetDirY = targetY(p.getY(), escaped);
+            final double targetDirX = nextTargetX(p.getX(), escaped);
+            final double targetDirY = nextTargetY(p.getY(), escaped);
             final double targetDirMod = Math.hypot(targetDirX, targetDirY);
 
             newVx = newVMod * (targetDirX / targetDirMod);
             newVy = newVMod * (targetDirY / targetDirMod);
         } else {
-            final double escapeMod = Math.hypot(escapeX, escapeY);
-            newVx   = Ve * (escapeX / escapeMod);
-            newVy   = Ve * (escapeY / escapeMod);
+            final double escapeMod = Math.hypot(dx, dy);
+            newVx   = Ve * (dx / escapeMod);
+            newVy   = Ve * (dy / escapeMod);
             newR    = minR;
         }
 
+        return new Particle(p.getId(), p.getX() + newVx*dt, p.getY() + newVy*dt, newVx, newVy, p.getMass(), newR);
     }
 
-    private double targetX(final double x, final boolean escaped) {
+    private double nextTargetX(final double x, final boolean escaped) {
         final double leftLimit  = escaped ?
                 (L/2 - TARGET_LENGTH/2) + TARGET_TRIM * TARGET_LENGTH
                 : L/2 - DOOR_WIDTH/2 + TARGET_TRIM*DOOR_WIDTH;
@@ -215,7 +224,12 @@ public class Board {
                 ? leftLimit + Math.random() * (rightLimit - leftLimit) - x : 0;
     }
 
-    private double targetY(final double y, final boolean escaped) {
+    private double nextTargetY(final double y, final boolean escaped) {
         return escaped ? TARGET_DISTANCE_FROM_DOOR - y : -y;
+    }
+
+    public void updateParticles(final List<Particle> currentState) {
+        this.particles = currentState;
+        sortBoard(particles);
     }
 }
