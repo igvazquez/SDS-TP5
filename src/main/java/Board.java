@@ -35,6 +35,10 @@ public class Board {
         sortBoard(particles);
     }
 
+    public double getMaxR() {
+        return maxR;
+    }
+
     public void sortBoard(List<Particle> newParticles) {
         for (int i = 0; i < M * M; i++) {
             cells.put(i, new ArrayList<>());
@@ -58,6 +62,18 @@ public class Board {
         return i + M * j;
     }
 
+    private static boolean overlap(double x, double y, double r, List<Particle> particles) {
+        if (particles.size() == 0) {
+            return false;
+        }
+        for (Particle particle : particles) {
+            if ((Math.pow(particle.getX() - x, 2) + Math.pow(particle.getY() - y, 2)) <= Math.pow(particle.getRadius() + r, 2)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static Board getRandomBoard(int n, double l, int m, double minR,
                                        double maxR, double maxV, double tau,
                                        double beta, double ve,double maxMass) {
@@ -69,11 +85,14 @@ public class Board {
 
         int i;
         for (i = 0; i < n; i++) {
-            x = Math.random() * l;
-            y = Math.random() * l;
+            do {
+                x = Math.random() * l;
+                y = Math.random() * l;
+                radius = ThreadLocalRandom.current().nextDouble(minR, maxR);
+            } while (overlap(x, y, radius, particles));
+
             vel = calculateVelocityToTarget(maxV, l, x, y);
             mass = Math.random() * maxMass;
-            radius = ThreadLocalRandom.current().nextDouble(minR, maxR);
 
             particles.add(new Particle(i, x, y, vel[0], vel[1], mass, radius));
         }
@@ -169,7 +188,7 @@ public class Board {
                 dx += diffX / distance;
                 dy += p.getY() / distance;
             } else if (p.getX() + p.getRadius() >= L/2 + DOOR_WIDTH/2) {
-                final double diffX = p.getY() -  L/2 + DOOR_WIDTH/2;
+                final double diffX = p.getX() -  L/2 + DOOR_WIDTH/2;
                 final double distance = Math.hypot(diffX, p.getY());
 
                 dx += diffX / distance;
@@ -178,7 +197,7 @@ public class Board {
         }
 
         for(final Particle other : neighbours) {
-            if(p.getId() != other.getId()){
+            if(p.getId() != other.getId() && p.collides(other)){
                 double diffX = p.getX() - other.getX();
                 double diffY = p.getY() - other.getY();
                 double distance = Math.hypot(diffX, diffY);

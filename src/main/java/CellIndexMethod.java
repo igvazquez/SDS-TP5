@@ -21,9 +21,12 @@ public class CellIndexMethod {
         this.rc = rc;
 
         neighboursMap = new HashMap<>(board.getParticles().size());
-        for (int i = 0; i < board.getParticles().size(); i++) {
-            neighboursMap.put(i, new HashSet<>());
+        for(Particle p : board.getParticles()) {
+            neighboursMap.put(p.getId(), new HashSet<>());
         }
+        /*for (int i = 0; i < board.getParticles().size(); i++) {
+            neighboursMap.put(i, new HashSet<>());
+        } */
     }
 
     private int getRightIndex(int currentCellIndex, int row, int col, boolean periodicOutline) {

@@ -29,11 +29,11 @@ public class CrowdSimulation {
             if(i++ % 10 == 0){
                 System.out.println("Iter: " + i);
             }
-            cim = new CellIndexMethod(board, rc, false);
+            cim = new CellIndexMethod(board, board.getMaxR(), false);
             cim.calculateNeighbours();
             currentState = doStep(currentState, cim);
             // TODO: actualizar particles de board, ahora se rompe todo
-            //board.updateParticles(currentState);
+            board.updateParticles(currentState);
             states.add(currentState);
         }
         writeBoardToFile();
