@@ -13,7 +13,7 @@ public class Main {
         double tau = 0.5;
         double l = 20;
 
-        Board board = Board.getRandomBoard(5, l, Board.optM(20, maxR), minR, maxR, maxV, tau, beta, maxV, maxMass);
+        Board board = Board.getRandomBoard(200, l, Board.optM(20, maxR), minR, maxR, maxV, tau, beta, maxV, maxMass);
         /*List<Particle> particles = new LinkedList<>();
         double[] v = Board.calculateVelocityToTarget(maxV, l, 10, 5);
         particles.add(new Particle(0, 10, 5, v[0], v[1], 1, maxR));
@@ -23,6 +23,6 @@ public class Main {
         particles.add(new Particle(2, 11, 5, v[0], v[1], 1, maxR));
         Board board = new Board(l, minR, maxR, maxV, tau, beta, ve, Board.optM(l, maxR), particles); */
         CrowdSimulation cs = new CrowdSimulation(board, maxR, beta, tau);
-        cs.simulate(100);
+        cs.simulate(1000);
     }
 }

@@ -56,12 +56,12 @@ public class CrowdSimulation {
         FileWriter pos = new FileWriter("testBoard.xyz", false);
         BufferedWriter buffer = new BufferedWriter(pos);
         for(List<Particle> particles : states) {
-            buffer.write(String.valueOf(particles.size() + 4));
+            buffer.write(String.valueOf(particles.size() + 6));
             buffer.newLine();
             buffer.newLine();
             writeDummyParticles(buffer);
             for(Particle p : particles) {
-                buffer.write(p.getId() + " " + p.getX() + " " + p.getY() + " " + p.getVx() + " " + p.getVy());
+                buffer.write(p.getId() + " " + p.getX() + " " + p.getY() + " " + p.getVx() + " " + p.getVy() + " " + p.getRadius());
                 buffer.newLine();
             }
         }
@@ -71,13 +71,17 @@ public class CrowdSimulation {
     }
 
     private void writeDummyParticles(final BufferedWriter buffer) throws IOException {
-        buffer.write("201 0 0 0 0");
+        buffer.write("201 0 0 0 0 0.0001");
         buffer.newLine();
-        buffer.write("202 20 0 0 0");
+        buffer.write("202 20 0 0 0 0.0001");
         buffer.newLine();
-        buffer.write("203 0 20 0 0");
+        buffer.write("203 0 20 0 0 0.0001");
         buffer.newLine();
-        buffer.write("204 20 20 0 0");
+        buffer.write("204 20 20 0 0 0.0001");
+        buffer.newLine();
+        buffer.write("205 "+(board.getL()/2 - Board.DOOR_WIDTH/2)+" 0 0 0 0.1");
+        buffer.newLine();
+        buffer.write("206 "+(board.getL()/2 + Board.DOOR_WIDTH/2)+" 0 0 0 0.1");
         buffer.newLine();
     }
 }

@@ -66,8 +66,8 @@ public class Board {
         if (particles.size() == 0) {
             return false;
         }
-        for (Particle particle : particles) {
-            if ((Math.pow(particle.getX() - x, 2) + Math.pow(particle.getY() - y, 2)) <= Math.pow(particle.getRadius() + r, 2)) {
+        for (Particle p : particles) {
+            if (Math.hypot(x - p.getX(), y - p.getY()) - r - p.getRadius() <= 0) {
                 return true;
             }
         }
@@ -180,8 +180,7 @@ public class Board {
         } else if ((p.getY() <= 0 && p.getY() + p.getRadius() >= 0) || (p.getY() > 0 && p.getY() - p.getRadius() <= 0)) {
             if (p.getX() <= L/2 - DOOR_WIDTH/2 || p.getX() >= L/2 + DOOR_WIDTH/2) {
                 dy += 1;
-            }
-            if (p.getX() - p.getRadius() <= L/2 - DOOR_WIDTH/2) {
+            } else if (p.getX() - p.getRadius() <= L/2 - DOOR_WIDTH/2) {
                 final double diffX = p.getX() - L/2 - DOOR_WIDTH/2;
                 final double distance = Math.hypot(diffX, p.getY());
 
