@@ -10,12 +10,16 @@ public class CrowdSimulation {
     private final double rc;
     private final double beta;
     private final double tau;
+    private double t;
+    private OutputData outputData;
 
     public CrowdSimulation(final Board board, final double rc, final double beta, final double tau) {
         this.board = board;
         this.rc = rc;
         this.beta = beta;
         this.tau = tau;
+        this.t = 0;
+        this.outputData = new OutputData();
     }
 
     public void simulate(final int maxIter) throws IOException {
@@ -37,9 +41,11 @@ public class CrowdSimulation {
             states.add(currentState);
         }
         writeBoardToFile();
+        outputData.writeTimesToFile();
     }
 
     private List<Particle> doStep(final List<Particle> currentState, final CellIndexMethod cim) {
+        this.t += board.getDt();
         List<Particle> nextState = new ArrayList<>(currentState.size());
         Map<Integer, Set<Particle>> neighbours = cim.getNeighboursMap();
         for (Particle p : currentState) {
@@ -47,6 +53,9 @@ public class CrowdSimulation {
 
             if(newParticle.getY() > 0) {
                 nextState.add(newParticle);
+            } else {
+                //registro tiempo de escape de la part
+                this.outputData.getEscapeTimes().add(t);
             }
         }
         return nextState;

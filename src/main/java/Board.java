@@ -35,6 +35,10 @@ public class Board {
         sortBoard(particles);
     }
 
+    public double getDt() {
+        return dt;
+    }
+
     public double getMaxR() {
         return maxR;
     }
