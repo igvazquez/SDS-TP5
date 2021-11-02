@@ -30,8 +30,11 @@ public class Main {
         double beta = (double) data.get("beta");
         double tau =(double) data.get("tau");
         double l = (double) data.get("l");
+        int n = (int) data.get("n");
+        double d = (double) data.get("d");
 
-        Board board = Board.getRandomBoard(200, l, Board.optM(20, maxR), minR, maxR, maxV, tau, beta, maxV, maxMass);
+
+        Board board = Board.getRandomBoard(n, d, l, Board.optM(20, maxR), minR, maxR, maxV, tau, beta, maxV, maxMass);
         /*List<Particle> particles = new LinkedList<>();
         double[] v = Board.calculateVelocityToTarget(maxV, l, 10, 5);
         particles.add(new Particle(0, 10, 5, v[0], v[1], 1, maxR));

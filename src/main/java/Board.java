@@ -3,7 +3,6 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class Board {
 
-    public static final double DOOR_WIDTH = 1.2;
     public static final double TARGET_DISTANCE_FROM_DOOR = -10;
     public static final double TARGET_LENGTH = 3;
     public static final double TARGET_TRIM = 0.2;
@@ -16,17 +15,19 @@ public class Board {
     private final double tau;
     private final double beta;
     private final double dt;
+    private final double doorWidth;
     private final int M;
     private final Map<Integer, List<Particle>> cells;
     private List<Particle> particles;
 
-    public Board(double l, double minR, double maxR, double maxV, double tau,
+    public Board(double l, double d, double minR, double maxR, double maxV, double tau,
                  double beta, double Ve, int m, List<Particle> particles) {
         L = l;
         this.minR = minR;
         this.maxR = maxR;
         this.maxV = maxV;
         this.Ve = Ve;
+        this.doorWidth = d;
         this.tau = tau;
         this.beta = beta;
         this.dt = minR / 2 * Math.max(maxV, Ve);
@@ -41,6 +42,10 @@ public class Board {
 
     public double getMaxR() {
         return maxR;
+    }
+
+    public double getDoorWidth() {
+        return doorWidth;
     }
 
     public void sortBoard(List<Particle> newParticles) {
@@ -78,7 +83,7 @@ public class Board {
         return false;
     }
 
-    public static Board getRandomBoard(int n, double l, int m, double minR,
+    public static Board getRandomBoard(int n, double d, double l, int m, double minR,
                                        double maxR, double maxV, double tau,
                                        double beta, double ve,double maxMass) {
 
@@ -95,19 +100,19 @@ public class Board {
                 radius = ThreadLocalRandom.current().nextDouble(minR, maxR);
             } while (overlap(x, y, radius, particles));
 
-            vel = calculateVelocityToTarget(maxV, l, x, y);
+            vel = calculateVelocityToTarget(maxV, l, d, x, y);
             mass = Math.random() * maxMass;
 
             particles.add(new Particle(i, x, y, vel[0], vel[1], mass, radius));
         }
 
-        return new Board(l, minR, maxR, maxV, tau, beta, ve, m, particles);
+        return new Board(l, d, minR, maxR, maxV, tau, beta, ve, m, particles);
     }
 
-    public static double[] calculateVelocityToTarget(final double maxV, final double l, final double x, final double y) {
+    public static double[] calculateVelocityToTarget(final double maxV, final double l, final double doorWidth, final double x, final double y) {
         double v = Math.random() * maxV;
-        final double leftLimit  = l/2 - DOOR_WIDTH/2 + TARGET_TRIM*DOOR_WIDTH;
-        final double rightLimit = l/2 + DOOR_WIDTH/2 - TARGET_TRIM * DOOR_WIDTH;
+        final double leftLimit  = l/2 - doorWidth/2 + TARGET_TRIM*doorWidth;
+        final double rightLimit = l/2 + doorWidth/2 - TARGET_TRIM * doorWidth;
         double dx = x < leftLimit || x > rightLimit
                 ? leftLimit + Math.random() * (rightLimit - leftLimit) - x : 0;
         final double dy = -y;
@@ -182,16 +187,16 @@ public class Board {
         if (p.getY() + p.getRadius() >= L) {
             dy -= 1;
         } else if ((p.getY() <= 0 && p.getY() + p.getRadius() >= 0) || (p.getY() > 0 && p.getY() - p.getRadius() <= 0)) {
-            if (p.getX() <= L/2 - DOOR_WIDTH/2 || p.getX() >= L/2 + DOOR_WIDTH/2) {
+            if (p.getX() <= L/2 - doorWidth/2 || p.getX() >= L/2 + doorWidth/2) {
                 dy += 1;
-            } else if (p.getX() - p.getRadius() <= L/2 - DOOR_WIDTH/2) {
-                final double diffX = p.getX() - L/2 - DOOR_WIDTH/2;
+            } else if (p.getX() - p.getRadius() <= L/2 - doorWidth/2) {
+                final double diffX = p.getX() - L/2 - doorWidth/2;
                 final double distance = Math.hypot(diffX, p.getY());
 
                 dx += diffX / distance;
                 dy += p.getY() / distance;
-            } else if (p.getX() + p.getRadius() >= L/2 + DOOR_WIDTH/2) {
-                final double diffX = p.getX() -  L/2 + DOOR_WIDTH/2;
+            } else if (p.getX() + p.getRadius() >= L/2 + doorWidth/2) {
+                final double diffX = p.getX() -  L/2 + doorWidth/2;
                 final double distance = Math.hypot(diffX, p.getY());
 
                 dx += diffX / distance;
@@ -237,10 +242,10 @@ public class Board {
     private double nextTargetX(final double x, final boolean escaped) {
         final double leftLimit  = escaped ?
                 (L/2 - TARGET_LENGTH/2) + TARGET_TRIM * TARGET_LENGTH
-                : L/2 - DOOR_WIDTH/2 + TARGET_TRIM*DOOR_WIDTH;
+                : L/2 - doorWidth/2 + TARGET_TRIM*doorWidth;
         final double rightLimit = escaped ?
                 (L/2 + TARGET_LENGTH/2) - TARGET_TRIM * TARGET_LENGTH
-                : L/2 + DOOR_WIDTH/2 - TARGET_TRIM * DOOR_WIDTH;
+                : L/2 + doorWidth/2 - TARGET_TRIM * doorWidth;
 
         return x < leftLimit || x > rightLimit
                 ? leftLimit + Math.random() * (rightLimit - leftLimit) - x : 0;

@@ -16,7 +16,7 @@ public class OutputData {
     }
 
     public void writeTimesToFile() throws IOException {
-        FileWriter pos = new FileWriter("times.csv", false);
+        FileWriter pos = new FileWriter("times_5.csv", false);
         BufferedWriter buffer = new BufferedWriter(pos);
         for(double time : escapeTimes) {
             buffer.write(String.valueOf(time));

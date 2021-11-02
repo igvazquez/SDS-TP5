@@ -88,9 +88,9 @@ public class CrowdSimulation {
         buffer.newLine();
         buffer.write("204 20 20 0 0 0.0001");
         buffer.newLine();
-        buffer.write("205 "+(board.getL()/2 - Board.DOOR_WIDTH/2)+" 0 0 0 0.1");
+        buffer.write("205 "+(board.getL()/2 - this.board.getDoorWidth()/2)+" 0 0 0 0.1");
         buffer.newLine();
-        buffer.write("206 "+(board.getL()/2 + Board.DOOR_WIDTH/2)+" 0 0 0 0.1");
+        buffer.write("206 "+(board.getL()/2 + this.board.getDoorWidth()/2)+" 0 0 0 0.1");
         buffer.newLine();
     }
 }
