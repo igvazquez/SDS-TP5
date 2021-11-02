@@ -1,17 +1,35 @@
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import org.yaml.snakeyaml.Yaml;
 
 public class Main {
 
     public static void main(String[] args) throws IOException {
-        double minR = 0.15;
-        double maxR = 0.32;
-        double maxV = 2;
-        double maxMass = 1;
-        double beta = 0.9;
-        double tau = 0.5;
-        double l = 20;
+        
+        InputStream inputStream = null;
+        try {
+            inputStream = new FileInputStream("src/main/resources/config.yml");
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
+        Yaml yaml = new Yaml();
+        Map<String, Object> data = yaml.load(inputStream);
+        if(data.isEmpty()) {
+            throw new IllegalArgumentException("No se han detectado argumentos.");
+        }
+        
+        double minR = (double) data.get("minR");
+        double maxR = (double) data.get("maxR");
+        double maxV = (double) data.get("maxV");
+        double maxMass = (double) data.get("maxMass");
+        double beta = (double) data.get("beta");
+        double tau =(double) data.get("tau");
+        double l = (double) data.get("l");
 
         Board board = Board.getRandomBoard(200, l, Board.optM(20, maxR), minR, maxR, maxV, tau, beta, maxV, maxMass);
         /*List<Particle> particles = new LinkedList<>();
