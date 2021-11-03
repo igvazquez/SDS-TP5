@@ -53,11 +53,9 @@ public class CrowdSimulation {
 
             if(newParticle.getY() > 0) {
                 nextState.add(newParticle);
-            } else {
-                //registro tiempo de escape de la part
-                this.outputData.getEscapeTimes().add(t);
             }
         }
+        outputData.getEscapeData().put(this.t, 200 - nextState.size());
         return nextState;
     }
 
