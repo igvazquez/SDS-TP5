@@ -1,10 +1,8 @@
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class OutputData {
     private final Map<Double, Integer> escapeData;
@@ -29,5 +27,25 @@ public class OutputData {
         buffer.flush();
         buffer.close();
         pos.close();
+    }
+
+    public void nombrePendiente(List<String> files) {
+        Map<Integer, Double> result = new HashMap<>();
+        try {
+            for(String file : files) {
+                Scanner st = new Scanner(new File(file));
+                st.useDelimiter(";");
+                while(st.hasNextLine()) {
+                    double time = st.nextDouble();
+                    int n = st.nextInt();
+                    if(result.containsKey(n)) {
+                        time = (time + result.get(n)) / 2;
+                    }
+                    result.put(n, time);
+                }
+            }
+        } catch (Exception e) {
+
+        }
     }
 }
