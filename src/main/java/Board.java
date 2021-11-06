@@ -30,7 +30,7 @@ public class Board {
         this.doorWidth = d;
         this.tau = tau;
         this.beta = beta;
-        this.dt = minR / 2 * Math.max(maxV, Ve);
+        this.dt = minR / (2 * Math.max(maxV, Ve));
         M = m;
         this.cells = new HashMap<>();
         sortBoard(particles);
@@ -190,13 +190,13 @@ public class Board {
             if (p.getX() <= L/2 - doorWidth/2 || p.getX() >= L/2 + doorWidth/2) {
                 dy += 1;
             } else if (p.getX() - p.getRadius() <= L/2 - doorWidth/2) {
-                final double diffX = p.getX() - L/2 - doorWidth/2;
+                final double diffX = p.getX() - L/2 + doorWidth/2;
                 final double distance = Math.hypot(diffX, p.getY());
 
                 dx += diffX / distance;
                 dy += p.getY() / distance;
             } else if (p.getX() + p.getRadius() >= L/2 + doorWidth/2) {
-                final double diffX = p.getX() -  L/2 + doorWidth/2;
+                final double diffX = p.getX() -  L/2 - doorWidth/2;
                 final double distance = Math.hypot(diffX, p.getY());
 
                 dx += diffX / distance;

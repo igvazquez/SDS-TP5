@@ -3,6 +3,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 simulations = 50
+dt = 0.0375
+
 df = pd.read_csv('ejB.csv', sep=',')
 dfs = []
 for i in range(simulations):
@@ -21,7 +23,6 @@ std = [np.std(t['t']) for t in times]
 
 np_array = np.array(list(map(lambda x: x.to_numpy(), dfs)))
 
-dt = 0.15
 t = 0
 Q = []
 T = []

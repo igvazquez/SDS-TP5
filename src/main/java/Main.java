@@ -36,6 +36,6 @@ public class Main {
 
         Board board = Board.getRandomBoard(n, d, l, Board.optM(20, maxR), minR, maxR, maxV, tau, beta, maxV, maxMass);
         CrowdSimulation cs = new CrowdSimulation(board, maxR, beta, tau);
-        cs.simulate(1000, true);
+        cs.simulate(20000, true);
     }
 }

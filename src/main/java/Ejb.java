@@ -39,7 +39,7 @@ public class Ejb {
         for (int i = 0; i < simulations; i++) {
             Board board = Board.getRandomBoard(n, d, l, Board.optM(20, maxR), minR, maxR, maxV, tau, beta, maxV, maxMass);
             CrowdSimulation cs = new CrowdSimulation(board, maxR, beta, tau);
-            cs.simulate(1000, false);
+            cs.simulate(100000, false);
             writeToCsv(buffer, cs.getOutputData(), i);
         }
         buffer.flush();

@@ -32,8 +32,9 @@ public class CrowdSimulation {
 
         int i = 0;
         while (!currentState.isEmpty() && i < maxIter) {
-            if(i++ % 10 == 0){
+            if(i++ % 500 == 0){
                 System.out.println("Iter: " + i);
+                System.out.println("Size: " + currentState.size());
             }
             cim = new CellIndexMethod(board, board.getMaxR(), false);
             cim.calculateNeighbours();
