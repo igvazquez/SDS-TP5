@@ -30,7 +30,7 @@ public class Ejb {
         int n = (int) data.get("n");
         double d = (double) data.get("d");
 
-        int simulations = 30;
+        int simulations = 50;
         FileWriter pos = new FileWriter("ejB.csv", false);
         BufferedWriter buffer = new BufferedWriter(pos);
         buffer.write("simulation,t,n_t");
