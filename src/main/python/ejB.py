@@ -1,4 +1,5 @@
 import numpy as np
+from numpy.lib.stride_tricks import sliding_window_view
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -31,8 +32,12 @@ for i in range(np_array.shape[1]):
     a = np_array[:,i]
     ns.append(np.sum(a,0)/len(a))
 
-for i in range(len(ns) - 1):
-    q = (ns[i+1][1] - ns[i][1])/dt
+ns = np.array(ns)
+W = 200
+window = sliding_window_view(ns[:,1], W)
+ret = [ (a[-1] - a[0])/W/dt for a in window]
+for i in range(len(ns) - W):
+    q = (ns[i+W][1] - ns[i][1])/W
     print("q: " + str(q))
     Q.append(q)
     T.append(ns[i][0])
@@ -50,7 +55,8 @@ ax.grid(which="both")
 
 fig = plt.figure(figsize=(16, 10))
 ax = fig.add_subplot(1, 1, 1)
-ax.plot(T, Q)
+# ax.plot(T, Q)
+ax.plot(ns[:,0][:len(ns)-W+1], ret, 'o')
 ax.set_xlabel(r'$t$ (s)', size=20)
 ax.set_ylabel(r'Q(t)', size=20)
 ax.grid(which="both")
