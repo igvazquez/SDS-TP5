@@ -29,7 +29,7 @@ def plot_dataframe(df):
     plt.figure()
 
 
-basePath = '/home/abossi/Desktop/clases/SS/SDS-TP5/Data/'
+basePath = 'Data/'
 #list the files
 file_list = os.listdir(basePath)
 #read them into pandas

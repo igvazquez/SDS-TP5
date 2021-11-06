@@ -35,15 +35,7 @@ public class Main {
 
 
         Board board = Board.getRandomBoard(n, d, l, Board.optM(20, maxR), minR, maxR, maxV, tau, beta, maxV, maxMass);
-        /*List<Particle> particles = new LinkedList<>();
-        double[] v = Board.calculateVelocityToTarget(maxV, l, 10, 5);
-        particles.add(new Particle(0, 10, 5, v[0], v[1], 1, maxR));
-        v = Board.calculateVelocityToTarget(maxV, l, 9, 5);
-        particles.add(new Particle(1, 9, 5, v[0], v[1], 1, maxR));
-        v = Board.calculateVelocityToTarget(maxV, l, 11, 5);
-        particles.add(new Particle(2, 11, 5, v[0], v[1], 1, maxR));
-        Board board = new Board(l, minR, maxR, maxV, tau, beta, ve, Board.optM(l, maxR), particles); */
         CrowdSimulation cs = new CrowdSimulation(board, maxR, beta, tau);
-        cs.simulate(1000);
+        cs.simulate(1000, true);
     }
 }

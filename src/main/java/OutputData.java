@@ -8,7 +8,7 @@ public class OutputData {
     private final Map<Double, Integer> escapeData;
 
     public OutputData() {
-        this.escapeData = new HashMap<>();
+        this.escapeData = new TreeMap<>();
     }
 
     public Map<Double, Integer> getEscapeData() {

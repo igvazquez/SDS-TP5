@@ -1,8 +1,11 @@
+import lombok.Data;
+
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 
+@Data
 public class CrowdSimulation {
 
     private List<List<Particle>> states = new LinkedList<>();
@@ -11,7 +14,7 @@ public class CrowdSimulation {
     private final double beta;
     private final double tau;
     private double t;
-    private OutputData outputData;
+    private final OutputData outputData;
 
     public CrowdSimulation(final Board board, final double rc, final double beta, final double tau) {
         this.board = board;
@@ -22,12 +25,11 @@ public class CrowdSimulation {
         this.outputData = new OutputData();
     }
 
-    public void simulate(final int maxIter) throws IOException {
+    public void simulate(final int maxIter, final boolean logToFile) throws IOException {
         List<Particle> currentState = board.getParticles();
         states.add(currentState);
         CellIndexMethod cim;
 
-        final Set<Particle> alreadyEscaped = new HashSet<>(currentState.size());
         int i = 0;
         while (!currentState.isEmpty() && i < maxIter) {
             if(i++ % 10 == 0){
@@ -36,12 +38,13 @@ public class CrowdSimulation {
             cim = new CellIndexMethod(board, board.getMaxR(), false);
             cim.calculateNeighbours();
             currentState = doStep(currentState, cim);
-            // TODO: actualizar particles de board, ahora se rompe todo
             board.updateParticles(currentState);
             states.add(currentState);
         }
-        writeBoardToFile();
-        outputData.writeTimesToFile();
+        if (logToFile){
+            writeBoardToFile();
+            outputData.writeTimesToFile();
+        }
     }
 
     private List<Particle> doStep(final List<Particle> currentState, final CellIndexMethod cim) {
