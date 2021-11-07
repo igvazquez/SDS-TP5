@@ -1,10 +1,11 @@
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.*;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-public class Ejb {
+public class Ejc {
 
     public static void main(String[] args) throws IOException {
         InputStream inputStream = null;
@@ -27,29 +28,34 @@ public class Ejb {
         double beta = (double) data.get("beta");
         double tau = (double) data.get("tau");
         double l = (double) data.get("l");
-        int n = (int) data.get("n");
-        double d = (double) data.get("d");
 
-        int simulations = 50;
-        FileWriter pos = new FileWriter("ejB.csv", false);
+        int simulations = 30;
+        List<Double> D = Arrays.asList(1.2, 1.8, 2.4, 3.0);
+        List<Integer> N = Arrays.asList(200, 260, 320, 380);
+
+        FileWriter pos = new FileWriter("ejC.csv", false);
         BufferedWriter buffer = new BufferedWriter(pos);
-        buffer.write("simulation,t,n_t");
+        buffer.write("d,simulation,t,n_t");
         buffer.newLine();
 
-        for (int i = 0; i < simulations; i++) {
-            Board board = Board.getRandomBoard(n, d, l, Board.optM(20, maxR), minR, maxR, maxV, tau, beta, maxV, maxMass);
-            CrowdSimulation cs = new CrowdSimulation(board, maxR, beta, tau);
-            cs.simulate(100000, false);
-            writeToCsv(buffer, cs.getOutputData(), i);
+        for (int j = 0; j < D.size(); j++) {
+            for (int i = 0; i < simulations; i++) {
+                double d = D.get(j);
+                int n = N.get(j);
+                Board board = Board.getRandomBoard(n, d, l, Board.optM(20, maxR), minR, maxR, maxV, tau, beta, maxV, maxMass);
+                CrowdSimulation cs = new CrowdSimulation(board, maxR, beta, tau);
+                cs.simulate(100000, false);
+                writeToCsv(buffer, cs.getOutputData(), d, i);
+            }
         }
         buffer.flush();
         buffer.close();
         pos.close();
     }
 
-    private static void writeToCsv(final BufferedWriter buffer, final OutputData outputData, final int i) throws IOException {
+    private static void writeToCsv(final BufferedWriter buffer, final OutputData outputData,final double d, final int i) throws IOException {
         for (Map.Entry<Double, Integer> entry : outputData.getEscapeData().entrySet()) {
-            buffer.write(i + "," + entry.getKey() + "," + entry.getValue());
+            buffer.write(d + "," + i + "," + entry.getKey() + "," + entry.getValue());
             buffer.newLine();
         }
     }

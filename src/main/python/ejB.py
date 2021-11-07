@@ -36,15 +36,6 @@ ns = np.array(ns)
 W = 200
 window = sliding_window_view(ns[:,1], W)
 ret = [ (a[-1] - a[0])/W/dt for a in window]
-for i in range(len(ns) - W):
-    q = (ns[i+W][1] - ns[i][1])/W
-    print("q: " + str(q))
-    Q.append(q)
-    T.append(ns[i][0])
-
-print("MaxQ: " + str(np.max(Q)))
-print("MinQ: " + str(np.min(Q)))
-print("Mean: " + str(np.mean(Q)))
 
 fig = plt.figure(figsize=(16, 10))
 ax = fig.add_subplot(1, 1, 1)
@@ -55,7 +46,6 @@ ax.grid(which="both")
 
 fig = plt.figure(figsize=(16, 10))
 ax = fig.add_subplot(1, 1, 1)
-# ax.plot(T, Q)
 ax.plot(ns[:,0][:len(ns)-W+1], ret, 'o')
 ax.set_xlabel(r'$t$ (s)', size=20)
 ax.set_ylabel(r'Q(t)', size=20)
