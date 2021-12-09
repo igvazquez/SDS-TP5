@@ -66,7 +66,7 @@ public class CrowdSimulation {
         FileWriter pos = new FileWriter("testBoard.xyz", false);
         BufferedWriter buffer = new BufferedWriter(pos);
         for(List<Particle> particles : states) {
-            buffer.write(String.valueOf(particles.size() + 6));
+            buffer.write(String.valueOf(particles.size() + 12));
             buffer.newLine();
             buffer.newLine();
             writeDummyParticles(buffer);
@@ -89,9 +89,21 @@ public class CrowdSimulation {
         buffer.newLine();
         buffer.write("204 20 20 0 0 0.0001");
         buffer.newLine();
+        buffer.write("214 5 18 0 0 0.0001");
+        buffer.newLine();
+        buffer.write("215 15 18 0 0 0.0001");
+        buffer.newLine();
+        buffer.write("216 5 2 0 0 0.0001");
+        buffer.newLine();
+        buffer.write("217 15 2 0 0 0.0001");
+        buffer.newLine();
         buffer.write("205 "+(board.getL()/2 - this.board.getDoorWidth()/2)+" 0 0 0 0.1");
         buffer.newLine();
         buffer.write("206 "+(board.getL()/2 + this.board.getDoorWidth()/2)+" 0 0 0 0.1");
+        buffer.newLine();
+        buffer.write("225 "+(board.getL()/2 - this.board.getDoorWidth()/2)+" 2 0 0 0.1");
+        buffer.newLine();
+        buffer.write("226 "+(board.getL()/2 + this.board.getDoorWidth()/2)+" 2 0 0 0.1");
         buffer.newLine();
     }
 }

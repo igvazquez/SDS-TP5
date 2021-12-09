@@ -6,6 +6,8 @@ public class Board {
     public static final double TARGET_DISTANCE_FROM_DOOR = -10;
     public static final double TARGET_LENGTH = 3;
     public static final double TARGET_TRIM = 0.2;
+    public static final double X_PADDING = 5.0;
+    public static final double Y_PADDING = 2.0;
 
     private final double L;
     private final double minR;
@@ -95,8 +97,8 @@ public class Board {
         int i;
         for (i = 0; i < n; i++) {
             do {
-                x = Math.random() * l;
-                y = Math.random() * l;
+                x = X_PADDING + Math.random() * (l-2*X_PADDING);
+                y = Y_PADDING + Math.random() * (l-2*Y_PADDING);
                 radius = ThreadLocalRandom.current().nextDouble(minR, maxR);
             } while (overlap(x, y, radius, particles));
 
@@ -179,14 +181,14 @@ public class Board {
         double dx = 0;
         double dy = 0;
 
-        if (p.getX() - p.getRadius() <= 0) {
+        if (p.getX() - p.getRadius() <= 0 + X_PADDING) {
             dx += 1;
-        } else if (p.getX() + p.getRadius() >= L) {
+        } else if (p.getX() + p.getRadius() >= L - X_PADDING) {
             dx -= 1;
         }
-        if (p.getY() + p.getRadius() >= L) {
+        if (p.getY() + p.getRadius() >= L - Y_PADDING) {
             dy -= 1;
-        } else if ((p.getY() <= 0 && p.getY() + p.getRadius() >= 0) || (p.getY() > 0 && p.getY() - p.getRadius() <= 0)) {
+        } else if ((p.getY() <= Y_PADDING && p.getY() + p.getRadius() >= Y_PADDING) || (p.getY() > Y_PADDING && p.getY() - p.getRadius() <= Y_PADDING)) {
             if (p.getX() <= L/2 - doorWidth/2 || p.getX() >= L/2 + doorWidth/2) {
                 dy += 1;
             } else if (p.getX() - p.getRadius() <= L/2 - doorWidth/2) {
@@ -222,7 +224,7 @@ public class Board {
             newR = Math.min(maxR, p.getRadius() + maxR/(tau/dt));
 
             final double newVMod = maxV * Math.pow((newR - minR) / (maxR - minR), beta);
-            boolean escaped = p.getY() <= 0;
+            boolean escaped = p.getY() <= Y_PADDING;
             final double targetDirX = nextTargetX(p.getX(), escaped);
             final double targetDirY = nextTargetY(p.getY(), escaped);
             final double targetDirMod = Math.hypot(targetDirX, targetDirY);
